@@ -1,0 +1,17 @@
+{
+  "name": "smart_antrian",
+  "displayName": "smart_antrian",
+  "expo": {
+    "name": "smart_antrian",
+    "slug": "smart_antrian",
+    "version": "1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
