@@ -11,6 +11,8 @@ import {
 	Image,
 } from 'react-native'
 
+import HeaderSpace from '../component/HeaderSpace'
+
 const ServicesProvider = (props) => {
 	const [serviceProvider, setServiceProvider] = useState([
 		{_id: '5e9b6d72ebe8a36c2356524d', name: 'Bank Mandiri', description: 'Sistem antrian bank mandiri', type: 'Bank', icon: 'https://reactnative.dev/img/tiny_logo.png'},
@@ -25,7 +27,7 @@ const ServicesProvider = (props) => {
 
   return (
     <View style={styles.container}>
-
+    	<HeaderSpace />
     	<FlatList
     		numColumns = {2}
     		keyExtractor = {(item) => item._id}

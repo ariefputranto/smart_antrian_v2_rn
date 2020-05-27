@@ -15,7 +15,7 @@ const HeaderSpace = (props) => {
 
 const styles = StyleSheet.create({
 	header: {
-		height: Platform.OS === 'ios' ? 80 : 0
+		height: Platform.OS === 'ios' ? 45 : 0
 	},
 })
 
