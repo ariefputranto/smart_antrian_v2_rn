@@ -11,9 +11,7 @@ import {
 	Image,
 } from 'react-native'
 
-import HeaderSpace from '../component/HeaderSpace'
-
-const ServicesProvider = (props) => {
+const ServicesProvider = ({ navigation, route }) => {
 	const [serviceProvider, setServiceProvider] = useState([
 		{_id: '5e9b6d72ebe8a36c2356524d', name: 'Bank Mandiri', description: 'Sistem antrian bank mandiri', type: 'Bank', icon: 'https://reactnative.dev/img/tiny_logo.png'},
 		{_id: '5e9b6d72ebe8a36c2356525d', name: 'Bank Central Asia', description: 'Sistem antrian bca', type: 'Bank', icon: 'https://reactnative.dev/img/tiny_logo.png'},
@@ -21,19 +19,19 @@ const ServicesProvider = (props) => {
 		{_id: '5e9b6d72ebe8a36c2356527d', name: 'RS Universitas Airlangga', description: 'Sistem antrian rsua', type: 'Bank', icon: 'https://reactnative.dev/img/tiny_logo.png'}
 	])
 
-	const clickHandler = (id) => {
-		alert("Element "+id+" click")
+	const clickHandler = (item) => {
+		const isResume = route.params?.isResume ?? false
+		navigation.navigate('Services', { service_provider: item, isResume: isResume })
 	}
 
   return (
     <View style={styles.container}>
-    	<HeaderSpace />
     	<FlatList
     		numColumns = {2}
     		keyExtractor = {(item) => item._id}
     		data = {serviceProvider}
     		renderItem = {({ item }) => (
-    			<TouchableOpacity style={ styles.touchAbleContent } onPress={ () => clickHandler(item._id) }>
+    			<TouchableOpacity style={ styles.touchAbleContent } onPress={ () => clickHandler(item) }>
 	    			<View style={styles.contentBody}>
 	    				<Image
 	    					style={styles.tinyLogo}

@@ -12,7 +12,7 @@ import { Button } from 'react-native-elements';
 import moment from 'moment-timezone'
 import DateTimePicker from '@react-native-community/datetimepicker'
 
-const ArrivalByTime = (props) => {
+const ArrivalByTime = ({ navigation, route }) => {
 	const [date, setDate] = useState( new Date() )
   const [show, setShow] = useState(Platform.OS === 'ios' ? true : false)
   const minDate = new Date()
@@ -43,7 +43,7 @@ const ArrivalByTime = (props) => {
   };
 
   const getQueue = () => {
-  	alert('get queue button is clicked')
+  	navigation.navigate('Queue', {services: route.params.services})
   }
 
   return (
@@ -70,7 +70,7 @@ const ArrivalByTime = (props) => {
 	    	<View>
 	    		<Text style={ styles.iosArrivalText }>Select Time of Your Arrival</Text>
 	    		<DateTimePicker
-	    			textColor={'#0275d8'}
+	    			textColor={'#43CAFF'}
 		        value={date}
 		        minimumDate={minDate}
 		        maximumDate={maxDate}
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
 	iosArrivalText: {
 		textAlign: 'center',
 		fontSize: 18,
-		color: '#0275d8'
+		color: '#43CAFF'
 	},
 
 	// get queue button
@@ -129,7 +129,8 @@ const styles = StyleSheet.create({
 	},
 	btn: {
 		width: 300,
-		borderRadius: 15
+		borderRadius: 15,
+		backgroundColor: '#43CAFF'
 	}
 })
 

@@ -12,9 +12,8 @@ import {
   YellowBox,
   TouchableOpacity
 } from 'react-native'
-import HeaderSpace from '../component/HeaderSpace'
 
-const Queue = (props) => {
+const Queue = ({ navigation }) => {
 	const [queue, setQueue] = useState([
 		{ "_id" : "5e9c83eccc641089eeb106e6", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 1, "date" : "2020-04-20", "time" : "2020-04-19T17:01:32.698Z", "__v" : 0 },
 		{ "_id" : "5e9c84001a186789feeada45", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 2, "date" : "2020-04-20", "time" : "2020-04-19T17:01:52.429Z", "__v" : 0 },
@@ -38,7 +37,7 @@ const Queue = (props) => {
 	])
 
 	const cancelQueue = () => {
-		alert('cancel is clicked')
+		navigation.popToTop()
 	}
 
 	YellowBox.ignoreWarnings(['VirtualizedLists should never be nested'])
@@ -47,7 +46,6 @@ const Queue = (props) => {
 
   	<SafeAreaView style={ styles.sav }>
 	  	<ScrollView style={ styles.sv }>
-	  		<HeaderSpace />
 		    <View style={ styles.container }>
 
 		    	<View style={styles.queueContainer}>
@@ -86,7 +84,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	sv: {
-    marginTop: 20,
     marginBottom: 20,
 	},
 	container: {

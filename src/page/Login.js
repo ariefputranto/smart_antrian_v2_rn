@@ -10,7 +10,7 @@ import {
 } from 'react-native'
 import { Button } from 'react-native-elements';
 
-const Login = (props) => {
+const Login = ({ navigation }) => {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 
