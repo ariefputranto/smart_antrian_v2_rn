@@ -11,14 +11,14 @@ import {
 	TouchableOpacity,
 } from 'react-native'
 
-const Loket = (props) => {
+const Loket = ({ navigation }) => {
 	const [loket, setLoket] = useState([
 		{ "_id" : "5e9b6fc189ccbe6c793bbf36", "user_id" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : {_id: "5e9b6f8c89ccbe6c793bbf34", name: 'Customer Service'}, "name" : "Loket 1", "token_expiration_time" : 86400, "latitude" : -7.279889855430536, "longitude" : 112.79027938842775, "assign_user_id" : "5e9b6f6589ccbe6c793bbf32", "time" : "2020-04-18T21:23:13.502Z", "inner_distance" : 5, "outer_distance" : 10, "__v" : 0 },
 		{ "_id" : "5e9b6fd789ccbe6c793bbf37", "user_id" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : {_id: "5e9b6f8c89ccbe6c793bbf34", name: 'Customer Service'}, "name" : "Loket 2", "token_expiration_time" : 86400, "latitude" : -7.279038466566971, "longitude" : 112.78993606567384, "assign_user_id" : null, "time" : "2020-04-18T21:23:35.122Z", "inner_distance" : 5, "outer_distance" : 10, "__v" : 0 }
 	])
 
-	const clickHandler = (id) => {
-		alert("Element "+id+" click")
+	const clickHandler = (item) => {
+		navigation.navigate('CallQueue', {loket: item})
 	}
 
   return (
@@ -40,7 +40,7 @@ const Loket = (props) => {
 		    	// if assign
     			} else {
     				return (
-		    			<TouchableOpacity onPress={ () => clickHandler(item._id) }>
+		    			<TouchableOpacity onPress={ () => clickHandler(item) }>
 			    			<View style={styles.contentBody}>
 			    				<Text style={styles.textTitle}>{item.name}</Text>
 			    				<Text style={styles.textDescription}>{item.service_id.name}</Text>

@@ -15,7 +15,7 @@ const Login = ({ navigation }) => {
 	const [password, setPassword] = useState('')
 
 	const login = () => {
-		alert('login button clicked')
+		navigation.navigate('AdminDrawer')
 	}
 
   return (
