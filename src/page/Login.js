@@ -1,22 +1,47 @@
 'use strict'
 
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
+import AsyncStorage from '@react-native-community/async-storage';
+import axios from 'axios'
 
 import {
   View,
   StyleSheet,
   Text,
   TextInput,
+  Alert
 } from 'react-native'
-import { Button } from 'react-native-elements';
+import { Button } from 'react-native-elements'
 
 const Login = ({ navigation }) => {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 
 	const login = () => {
-		navigation.navigate('AdminDrawer')
+		var params = {
+			username: username,
+			password: password
+		}
+
+		axios.post(url + '/api/login', params).then(async response => {
+			if (response.data.statusCode == 200) {
+				Alert.alert('Success!', response.data.message)
+
+				// save token into async storage
+				await AsyncStorage.setItem('token', response.data.data.token)
+				setTimeout(() => {
+					navigation.navigate('AdminDrawer')
+				}, 400)
+			} else {
+				Alert.alert('Warning!', response.data.message)
+			}
+		}, error => {
+			Alert.alert('Warning!', error.message)
+		})
+		
 	}
+
+	// const { signIn } = useContext(AuthContext);
 
   return (
     <View style={ styles.container }>
@@ -25,13 +50,13 @@ const Login = ({ navigation }) => {
     		<Text style={styles.loginDesc}>Please login first before using our feature</Text>
     		<TextInput 
     			style={styles.usernameInput}
-    			onChange={text => setUsername(text)}
+    			onChangeText={text => setUsername(text)}
     			value={username}
     			placeholder={'Username'}
     		/>
     		<TextInput 
     			style={styles.passwordInput}
-    			onChange={text => setPassword(text)}
+    			onChangeText={text => setPassword(text)}
     			value={password}
     			placeholder={'Password'}
     			secureTextEntry={true}

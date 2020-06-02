@@ -8,7 +8,8 @@
 
 import 'react-native-gesture-handler'
 import React from 'react'
-import Navigator from './src/routes/AuthDrawer'
+import Navigator from './src/routes/Navigation'
+import './src/global/config'
 
 export default function App() {
   return (
