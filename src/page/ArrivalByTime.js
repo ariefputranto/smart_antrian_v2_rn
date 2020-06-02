@@ -1,6 +1,7 @@
 'use strict'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import AsyncStorage from '@react-native-community/async-storage'
 
 import {
   View,
@@ -42,8 +43,28 @@ const ArrivalByTime = ({ navigation, route }) => {
     setShow(true)
   };
 
+  const getServiceProvider = async (services, date) => {
+  	var booked = await AsyncStorage.getItem('booked_by_time')
+  	if (booked !== null) {
+  		booked = JSON.parse(booked)
+  	} else {
+  		booked = []
+  	}
+
+  	booked = booked.filter(b => b._id != services._id)
+
+		booked.push({
+			...services,
+			booked_time: date.toString()
+		})
+
+		await AsyncStorage.setItem('booked_by_time', JSON.stringify(booked))
+  }
+
   const getQueue = () => {
-  	navigation.navigate('Queue', {services: route.params.services})
+  	var services = route.params.services
+  	getServiceProvider(services, date)
+  	navigation.navigate('ResumeUserQueueStack')
   }
 
   return (
@@ -85,7 +106,7 @@ const ArrivalByTime = ({ navigation, route }) => {
     	<Button
     		containerStyle={ styles.btnContainer }
     		buttonStyle={ styles.btn } 
-    		title="Get Queue" 
+    		title="Book Queue" 
     		onPress={ () => getQueue() } 
     		/>
     </View>

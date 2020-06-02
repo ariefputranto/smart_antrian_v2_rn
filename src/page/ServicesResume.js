@@ -1,7 +1,6 @@
 'use strict';
 
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 import AsyncStorage from '@react-native-community/async-storage'
 
 import {
@@ -11,46 +10,48 @@ import {
 	FlatList,
 	StyleSheet,
 	TouchableOpacity,
-	Alert,
 } from 'react-native'
 
-const Services = ({ navigation, route }) => {
+const ServicesResume = ({ navigation, route }) => {
 	const [services, setServices] = useState([])
-	const [guestToken, setGuestToken] = useState(null)
+	const [booked, setBooked] = useState(null)
 
-  const getGuestToken = async () => {
-    setGuestToken(await AsyncStorage.getItem('guest_token'))
+  const getBooked = async () => {
+  	setBooked(await AsyncStorage.getItem('booked_by_time'))
   }
 
-	const getServices = () => {
-		var serviceProvider = route.params.service_provider
-		if (guestToken !== null) {
-			var options = {
-				headers: {
-	        'Authorization': 'Bearer ' + guestToken,
-	        'Accept': 'application/json'
-	      }
-			}
+  const filterBooked = () => {
+  	var currentBooked = booked
+  	if (currentBooked !== null) {
+  		currentBooked = JSON.parse(currentBooked)
+  	} else {
+  		currentBooked = []
+  	}
 
-			axios.get(url + '/api/guest/services-by-provider/' + serviceProvider._id, options).then(response => {
-				if (response.data.statusCode == 200) {
-					setServices(response.data.data)
-				} else {
-					Alert.alert('Warning!', response.data.message)
-				}
-			}, error => {
-				Alert.alert('Warning!', error.message)
-			})
-		}
-	}
+  	var serviceProvider = route.params.service_provider
+  	var listServices = []
+  	for (var i = 0; i < currentBooked.length; i++) {
+  		if (currentBooked[i].service_provider_id._id != serviceProvider._id) {
+  			continue
+  		}
+
+  		// filter unique
+  		var filters = listServices.filter(item => item._id == currentBooked[i]._id)
+  		if (filters.length == 0) {
+  			listServices.push(currentBooked[i])
+  		}
+  	}
+
+  	setServices(listServices)
+  }
 
 	useEffect(() => {
-		getGuestToken()
-		getServices()
-	}, [guestToken])
+		getBooked()
+		filterBooked()
+	}, [booked])
 
 	const clickHandler = (item) => {
-		navigation.navigate('ServicesMethod', { services: item })
+		navigation.navigate('Queue', { services: item })
 	}
 
   return (
@@ -103,4 +104,4 @@ const styles = StyleSheet.create({
 	}
 })
 
-export default Services;
+export default ServicesResume;

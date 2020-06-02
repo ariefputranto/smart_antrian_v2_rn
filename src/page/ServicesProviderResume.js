@@ -1,8 +1,8 @@
 'use strict'
 
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
 import AsyncStorage from '@react-native-community/async-storage'
+import axios from 'axios'
 
 import {
 	View,
@@ -11,45 +11,42 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	Image,
-	Alert
 } from 'react-native'
 
-const ServicesProvider = ({ navigation, route }) => {
+const ServicesProviderResume = ({ navigation, route }) => {
 	const [serviceProvider, setServiceProvider] = useState([])
-  const [guestToken, setGuestToken] = useState(null)
+	const [book, setBook] = useState(null)
 
-  const getGuestToken = async () => {
-    setGuestToken(await AsyncStorage.getItem('guest_token'))
+  const getBooked = async () => {
+  	setBook(await AsyncStorage.getItem('booked_by_time'))
   }
 
-	const getServiceProvider = () => {
-		if (guestToken !== null) {
-			var options = {
-				headers: {
-	        'Authorization': 'Bearer ' + guestToken,
-	        'Accept': 'application/json'
-	      }
-			}
+  const filterBooked = () => {
+  	var booked = book
+  	if (booked !== null) {
+  		booked = JSON.parse(booked)
+  	} else {
+  		booked = []
+  	}
 
-			axios.get(url + '/api/guest/service-provider', options).then(response => {
-				if (response.data.statusCode == 200) {
-					setServiceProvider(response.data.data)
-				} else {
-					Alert.alert('Warning!', response.data.message)
-				}
-			}, error => {
-				Alert.alert('Warning!', error.message)
-			})
-		}
-	}
+  	var listServiceProvider = []
+  	for (var i = 0; i < booked.length; i++) {
+  		var filters = listServiceProvider.filter(item => item._id == booked[i].service_provider_id._id)
+  		if (filters.length == 0) {
+  			listServiceProvider.push(booked[i].service_provider_id)
+  		}
+  	}
+
+  	setServiceProvider(listServiceProvider)
+  }
 
 	useEffect(() => {
-		getGuestToken()
-		getServiceProvider()
-	}, [guestToken])
+		getBooked()
+		filterBooked()
+	}, [book])
 
 	const clickHandler = (item) => {
-		navigation.navigate('Services', { service_provider: item })
+		navigation.navigate('ServicesResume', { service_provider: item })
 	}
 
   return (
@@ -112,4 +109,4 @@ const styles = StyleSheet.create({
 	}
 })
 
-export default ServicesProvider
+export default ServicesProviderResume
