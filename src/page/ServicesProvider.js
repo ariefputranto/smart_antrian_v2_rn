@@ -1,7 +1,7 @@
 'use strict'
 
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import { guestApi } from '../component/CustomAxios'
 import AsyncStorage from '@react-native-community/async-storage'
 
 import {
@@ -16,37 +16,22 @@ import {
 
 const ServicesProvider = ({ navigation, route }) => {
 	const [serviceProvider, setServiceProvider] = useState([])
-  const [guestToken, setGuestToken] = useState(null)
-
-  const getGuestToken = async () => {
-    setGuestToken(await AsyncStorage.getItem('guest_token'))
-  }
 
 	const getServiceProvider = () => {
-		if (guestToken !== null) {
-			var options = {
-				headers: {
-	        'Authorization': 'Bearer ' + guestToken,
-	        'Accept': 'application/json'
-	      }
+		guestApi.get('/api/guest/service-provider').then(response => {
+			if (response.data.statusCode == 200) {
+				setServiceProvider(response.data.data)
+			} else {
+				Alert.alert('Warning!', response.data.message)
 			}
-
-			axios.get(url + '/api/guest/service-provider', options).then(response => {
-				if (response.data.statusCode == 200) {
-					setServiceProvider(response.data.data)
-				} else {
-					Alert.alert('Warning!', response.data.message)
-				}
-			}, error => {
-				Alert.alert('Warning!', error.message)
-			})
-		}
+		}, error => {
+			Alert.alert('Warning!', error.message)
+		})
 	}
 
 	useEffect(() => {
-		getGuestToken()
 		getServiceProvider()
-	}, [guestToken])
+	}, [])
 
 	const clickHandler = (item) => {
 		navigation.navigate('Services', { service_provider: item })

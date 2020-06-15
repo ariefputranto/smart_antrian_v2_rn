@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import AsyncStorage from '@react-native-community/async-storage'
-import axios from 'axios'
+import moment from 'moment-timezone'
 
 import {
 	View,
@@ -16,32 +16,54 @@ import {
 const ServicesProviderResume = ({ navigation, route }) => {
 	const [serviceProvider, setServiceProvider] = useState([])
 	const [book, setBook] = useState(null)
+	var getBookedInterval = null
 
   const getBooked = async () => {
-  	setBook(await AsyncStorage.getItem('booked_by_time'))
-  }
-
-  const filterBooked = () => {
-  	var booked = book
+  	var booked = await AsyncStorage.getItem('booked_by_time')
   	if (booked !== null) {
   		booked = JSON.parse(booked)
   	} else {
   		booked = []
   	}
 
-  	var listServiceProvider = []
-  	for (var i = 0; i < booked.length; i++) {
-  		var filters = listServiceProvider.filter(item => item._id == booked[i].service_provider_id._id)
-  		if (filters.length == 0) {
-  			listServiceProvider.push(booked[i].service_provider_id)
+  	booked = booked.filter(item => {
+  		// if tomorrow not include it and allow resume if from get location
+  		if (item.booked_time == null || moment().unix() <= moment(new Date(item.booked_time)).endOf('day').unix() ) {
+  			return item
   		}
-  	}
+  	})
 
-  	setServiceProvider(listServiceProvider)
+  	await AsyncStorage.setItem('booked_by_time', JSON.stringify(booked))
+		console.log(booked)
+		setBook(booked)
+  }
+
+  const filterBooked = () => {
+  	var booked = book
+  	if (booked !== null) {
+  		var listServiceProvider = []
+	  	for (var i = 0; i < booked.length; i++) {
+	  		var filters = listServiceProvider.filter(item => item._id == booked[i].service_provider_id._id)
+	  		if (filters.length == 0) {
+	  			listServiceProvider.push(booked[i].service_provider_id)
+	  		}
+	  	}
+
+	  	setServiceProvider(listServiceProvider)
+  	}
   }
 
 	useEffect(() => {
-		getBooked()
+		getBookedInterval = setInterval(() => {
+			getBooked()
+		}, 1000)
+
+		return () => {
+			clearInterval(getBookedInterval)
+		}
+	}, [])
+
+	useEffect(() => {
 		filterBooked()
 	}, [book])
 

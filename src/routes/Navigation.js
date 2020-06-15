@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
-import { createDrawerNavigator } from '@react-navigation/drawer'
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer'
 import { createStackNavigator } from '@react-navigation/stack'
-import axios from 'axios'
 import AsyncStorage from '@react-native-community/async-storage'
 
 // element
@@ -22,9 +21,13 @@ import ServicesMethod from '../page/ServicesMethod'
 import ArrivalByTime from '../page/ArrivalByTime'
 import Queue from '../page/Queue'
 
+// component
+import { userApi } from '../component/CustomAxios'
+
 const Drawer = createDrawerNavigator()
 const Stack = createStackNavigator()
 
+// Navigation Stack
 const Navigation = () => {
   const [token, setToken] = useState(null)
 
@@ -34,24 +37,9 @@ const Navigation = () => {
     setToken(currentToken)
   }
 
-  // generate imei for guest
-  const generateImei = () => {
-    const date = new Date().getTime().toString()
-    var imei = Math.round(Math.random() * 10000000) + date
-    return imei
-  }
-
-  // login as guest
-  const loginGuest = () => {
-    const params = {
-      imei: generateImei(),
-      expired_in: 86400 // 1 day expired
-    }
-
-    axios.post(url + '/api/login-guest', params).then(async response => {
-      if (response.data.statusCode == 200) {
-        await AsyncStorage.setItem('guest_token', response.data.data.token)
-      }
+  const checkLogin = () => {
+    userApi.get('/api/user/').then(async response => {
+      getToken()
     }, error => {
       Alert.alert('Warning!', error.message)
     })
@@ -61,26 +49,25 @@ const Navigation = () => {
     // if user
     if (token !== null) {
       return (
-        <Drawer.Navigator>
-          <Drawer.Screen name="AdminDrawer" component={AdminDrawer} options={{ title: 'Admin Page', 'swipeEnabled': false }} />
-          <Drawer.Screen name="UserDrawer" component={UserDrawer} options={{ title: 'User Page' }} />
-        </Drawer.Navigator>
+        <Stack.Navigator headerMode="none">
+          <Stack.Screen name="AdminDrawer" component={AdminDrawer} options={{ title: 'Admin Page', 'swipeEnabled': false }} />
+          <Stack.Screen name="UserDrawer" component={UserDrawer} options={{ title: 'User Page' }} />
+        </Stack.Navigator>
       )
 
     // if guest
     } else {
       return (
-        <Drawer.Navigator>
-          <Drawer.Screen name="UserDrawer" component={UserDrawer} options={{ title: 'User Page' }} />
-          <Drawer.Screen name="AdminDrawer" component={AdminDrawer} options={{ title: 'Admin Page', 'swipeEnabled': false }} />
-        </Drawer.Navigator>
+        <Stack.Navigator headerMode="none">
+          <Stack.Screen name="UserDrawer" component={UserDrawer} options={{ title: 'User Page' }} />
+          <Stack.Screen name="AdminDrawer" component={AdminDrawer} options={{ title: 'Admin Page', 'swipeEnabled': false }} />
+        </Stack.Navigator>
       )
     }
   }
 
   useEffect(() => {
-    getToken()
-    loginGuest()
+    checkLogin()
   }, [])
 
 	return (
@@ -90,6 +77,7 @@ const Navigation = () => {
 	)
 }
 
+// Admin Stack
 const AdminDrawer = ({ navigation }) => {
   const signOut = async () => {
     await AsyncStorage.removeItem('token')
@@ -125,7 +113,33 @@ const AdminDrawer = ({ navigation }) => {
   )
 }
 
-const UserDrawer = () => {
+// User Stack
+const UserDrawer = (props) => {
+  // const resetNavigation = (route) => {
+  //   props.navigation.navigate(route)
+  // }
+
+  // const CustomDrawerContent = (props) => {
+  //   return (
+  //     <DrawerContentScrollView {...props}>
+  //       <DrawerItem
+  //         label="New Queue"
+  //         onPress={() => resetNavigation('NewUserQueueStack')}
+  //       />
+  //       <DrawerItem
+  //         label="Resume Queue"
+  //         onPress={() => resetNavigation('ResumeUserQueueStack')}
+  //       />
+  //       <DrawerItem
+  //         label="Login"
+  //         onPress={() => resetNavigation('Login')}
+  //       />
+  //     </DrawerContentScrollView>
+  //   )
+  // }
+
+  // drawerContent={ (props) => <CustomDrawerContent {...props} /> }
+
   return (
     <Drawer.Navigator>
       <Drawer.Screen name="NewUserQueueStack" component={NewUserQueueStack} options={{ title: 'New Queue' }} />
@@ -135,6 +149,7 @@ const UserDrawer = () => {
   )
 }
 
+// User get new queue Stack
 const NewUserQueueStack = () => {
   const options = {
     default: { 
@@ -172,6 +187,7 @@ const NewUserQueueStack = () => {
   )
 }
 
+// User resume queue Stack
 const ResumeUserQueueStack = () => {
   const options = {
     default: { 

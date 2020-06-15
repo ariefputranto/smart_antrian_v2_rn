@@ -64,6 +64,7 @@ const ArrivalByTime = ({ navigation, route }) => {
   const getQueue = () => {
   	var services = route.params.services
   	getServiceProvider(services, date)
+  	navigation.popToTop()
   	navigation.navigate('ResumeUserQueueStack')
   }
 

@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
 	},
 	sv: {
     marginBottom: 20,
+    marginTop: 20,
 	},
 	container: {
 		flex: 1,
