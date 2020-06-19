@@ -11,8 +11,7 @@ const guestApi = axios.create({
   'baseURL': 'http://localhost:3000'
 })
 
-
-
+// Logout
 const logout = async () => {
   await AsyncStorage.removeItem('token')
 }

@@ -45,8 +45,11 @@ const ServicesResume = ({ navigation, route }) => {
   	setServices(listServices)
   }
 
-	useEffect(() => {
+  useEffect(() => {
 		getBooked()
+  }, [])
+
+	useEffect(() => {
 		filterBooked()
 	}, [booked])
 
