@@ -35,7 +35,7 @@ userApi.interceptors.response.use(response => {
 
   // if expired extend it
   if (response.data.message == "Authorization token expired") {
-    this.logout()
+    logout()
     return false
   }
 
@@ -94,7 +94,7 @@ guestApi.interceptors.response.use(response => {
 
   // if expired extend it
   if (response.data.message == "Authorization token expired") {
-    this.loginGuest()
+    loginGuest()
     return false
   }
 

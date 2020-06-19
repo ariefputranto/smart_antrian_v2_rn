@@ -41,8 +41,6 @@ const Login = ({ navigation }) => {
 		
 	}
 
-	// const { signIn } = useContext(AuthContext);
-
   return (
     <View style={ styles.container }>
 
