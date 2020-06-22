@@ -17,7 +17,7 @@ const ServicesResume = ({ navigation, route }) => {
 	const [booked, setBooked] = useState(null)
 
   const getBooked = async () => {
-  	setBooked(await AsyncStorage.getItem('booked_by_time'))
+  	setBooked(await AsyncStorage.getItem('booked'))
   }
 
   const filterBooked = () => {

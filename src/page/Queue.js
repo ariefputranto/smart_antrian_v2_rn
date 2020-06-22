@@ -1,6 +1,8 @@
 'use strict'
 
-import React, { useState }from 'react'
+import React, { useState, useEffect }from 'react'
+import { guestApi } from '../component/CustomAxios'
+import AsyncStorage from '@react-native-community/async-storage'
 
 import {
   View,
@@ -13,7 +15,7 @@ import {
   TouchableOpacity
 } from 'react-native'
 
-const Queue = ({ navigation }) => {
+const Queue = ({ navigation, route }) => {
 	const [queue, setQueue] = useState([
 		{ "_id" : "5e9c83eccc641089eeb106e6", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 1, "date" : "2020-04-20", "time" : "2020-04-19T17:01:32.698Z", "__v" : 0 },
 		{ "_id" : "5e9c84001a186789feeada45", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 2, "date" : "2020-04-20", "time" : "2020-04-19T17:01:52.429Z", "__v" : 0 },
@@ -35,12 +37,23 @@ const Queue = ({ navigation }) => {
 		{ "_id" : "5e9c896f3ce4438b32ba86da", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 18, "date" : "2020-04-20", "time" : "2020-04-19T17:25:03.915Z", "__v" : 0 },
 		{ "_id" : "5e9c898e45297c8b3dae6b24", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 19, "date" : "2020-04-20", "time" : "2020-04-19T17:25:34.563Z", "__v" : 0 },
 	])
+	const [service, setService] = useState(null)
 
 	const cancelQueue = () => {
 		navigation.popToTop()
 	}
 
 	YellowBox.ignoreWarnings(['VirtualizedLists should never be nested'])
+
+	// const get
+
+	useEffect(() => {
+		setService(route.params.services)
+	}, [])
+
+	useEffect(() => {
+		console.log(service)
+	}, [service])
 
   return (
 

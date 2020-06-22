@@ -1,6 +1,7 @@
 'use strict'
 
 import React, { useState }from 'react'
+import AsyncStorage from '@react-native-community/async-storage'
 
 import {
   View,
@@ -10,11 +11,29 @@ import {
 } from 'react-native'
 
 const ServicesMethod = ({ navigation, route }) => {
+	const addBooked = async (services) => {
+  	var booked = await AsyncStorage.getItem('booked')
+  	if (booked !== null) {
+  		booked = JSON.parse(booked)
+  	} else {
+  		booked = []
+  	}
+
+  	// remove old booked
+  	booked = booked.filter(b => b._id != services._id)
+
+  	// add new booked
+		booked.push(services)
+
+		await AsyncStorage.setItem('booked', JSON.stringify(booked))
+  }
+
 	const arrivalByTime = () => {
 		navigation.navigate('ArrivalByTime', { services: route.params.services })
 	}
 
 	const arrivalByPlace = () => {
+		addBooked(route.params.services)
 		navigation.navigate('Queue', { services: route.params.services })
 	}
 

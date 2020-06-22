@@ -43,27 +43,29 @@ const ArrivalByTime = ({ navigation, route }) => {
     setShow(true)
   };
 
-  const getServiceProvider = async (services, date) => {
-  	var booked = await AsyncStorage.getItem('booked_by_time')
+  const addBooked = async (services, date) => {
+  	var booked = await AsyncStorage.getItem('booked')
   	if (booked !== null) {
   		booked = JSON.parse(booked)
   	} else {
   		booked = []
   	}
 
+  	// remove old booked
   	booked = booked.filter(b => b._id != services._id)
 
+  	// add new booked
 		booked.push({
 			...services,
 			booked_time: date.toString()
 		})
 
-		await AsyncStorage.setItem('booked_by_time', JSON.stringify(booked))
+		await AsyncStorage.setItem('booked', JSON.stringify(booked))
   }
 
   const getQueue = () => {
   	var services = route.params.services
-  	getServiceProvider(services, date)
+  	addBooked(services, date)
   	navigation.popToTop()
   	navigation.navigate('ResumeUserQueueStack')
   }

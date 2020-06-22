@@ -19,7 +19,7 @@ const ServicesProviderResume = ({ navigation, route }) => {
 	var getBookedInterval = null
 
   const getBooked = async () => {
-  	var booked = await AsyncStorage.getItem('booked_by_time')
+  	var booked = await AsyncStorage.getItem('booked')
   	if (booked !== null) {
   		booked = JSON.parse(booked)
   	} else {
@@ -33,8 +33,7 @@ const ServicesProviderResume = ({ navigation, route }) => {
   		}
   	})
 
-  	await AsyncStorage.setItem('booked_by_time', JSON.stringify(booked))
-		console.log(booked)
+  	await AsyncStorage.setItem('booked', JSON.stringify(booked))
 		setBook(booked)
   }
 
