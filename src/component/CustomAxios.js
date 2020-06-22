@@ -54,30 +54,28 @@ const generateImei = async () => {
     await AsyncStorage.setItem('imei', checkImei)
   }
 
-  console.log(checkImei)
-
   return checkImei
 }
 
 // login as guest
-const loginGuest = () => {
+const loginGuest = async () => {
   const params = {
     imei: generateImei(),
     expired_in: 86400 // 1 day expired
   }
 
-  axios.post(url + '/api/login-guest', params).then(async response => {
-    if (response.data.statusCode == 200) {
-      await AsyncStorage.setItem('guest_token', response.data.data.token)
-    }
-  }, error => {
-    Alert.alert('Warning!', error.message)
-  })
+  console.log(params)
+
+  const response = await axios.post(url + '/api/login-guest', params)
+  const token = response.data.data.token
+  await AsyncStorage.setItem('guest_token', token)
+  return token
 }
 
 // Add a request interceptor
 guestApi.interceptors.request.use(async config => {
   var token = await AsyncStorage.getItem('guest_token')
+  // console.log(token)
   config.headers = {
     'Authorization': 'Bearer ' + token,
     'Accept': 'application/json'
@@ -89,12 +87,24 @@ guestApi.interceptors.request.use(async config => {
 })
 
 // Add a response interceptor
-guestApi.interceptors.response.use(response => {
+guestApi.interceptors.response.use(async response => {
 
   // if expired extend it
   if (response.data.message == "Authorization token expired") {
-    loginGuest()
-    return false
+    var token = await loginGuest()
+    var config = response.config
+    config.headers.Authorization = 'Bearer ' + token
+
+    return axios.request(config)
+  }
+
+  // if token invalid refresh
+  if (response.data.message == "Authorization token is invalid: jwt malformed") {
+    var token = await loginGuest()
+    var config = response.config
+    config.headers.Authorization = 'Bearer ' + token
+
+    return axios.request(config)
   }
 
   return response
