@@ -38,6 +38,8 @@ const Queue = ({ navigation, route }) => {
 		{ "_id" : "5e9c898e45297c8b3dae6b24", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 19, "date" : "2020-04-20", "time" : "2020-04-19T17:25:34.563Z", "__v" : 0 },
 	])
 	const [service, setService] = useState(null)
+	const [totalWaitingUser, setTotalWaitingUser] = useState(0)
+	var ws = null
 
 	const cancelQueue = () => {
 		navigation.popToTop()
@@ -45,7 +47,49 @@ const Queue = ({ navigation, route }) => {
 
 	YellowBox.ignoreWarnings(['VirtualizedLists should never be nested'])
 
-	// const get
+	// initial config websocket
+	const initWs = () => {
+		var host = 'ws://localhost:3000/' + service.service_provider_id._id
+		ws = new WebSocket(host)
+
+		ws.onmessage = msg => {
+			console.log(msg.data)
+			var response = JSON.parse(msg.data)
+			if (typeof response.data.url !== 'undefined') {
+				var url = response.data.url
+
+				// if last called
+				// if (url == '/queue/last-called') {
+				// 	if (typeof response.data.last_call !== 'undefined') {
+				// 		this.lastCalledNumber = response.data.last_call
+				// 		console.log(this.lastCalledNumber)
+				// 	}
+				// }
+
+				// get count
+				if (url == '/queue/count') {
+					if (typeof response.data.count_queue !== 'undefined') {
+						setTotalWaitingUser(response.data.count_queue)
+					}
+				}
+
+				// get new queue
+				if (url == '/queue/new') {
+					if (service._id == response.data.queue.service_id) {
+						ws.send(JSON.stringify({url: '/queue/count', service_id: service._id}))
+					}
+				}
+
+			}
+		}
+
+		ws.onopen = () => {
+			if (typeof service._id !== 'undefined') {
+				// this.ws.send(JSON.stringify({url: '/queue/last-called', service_id: service._id, loket_id: this.singleLoket._id}))
+				ws.send(JSON.stringify({url: '/queue/count', service_id: service._id}))
+			}
+		}
+	}
 
 	useEffect(() => {
 		setService(route.params.services)
@@ -53,6 +97,18 @@ const Queue = ({ navigation, route }) => {
 
 	useEffect(() => {
 		console.log(service)
+
+		// init websocket
+		if (service != null) {
+			initWs()
+		}
+
+		return () => {
+			// close websocket connection
+			if (ws !== null) {
+				ws.close()
+			}
+		}
 	}, [service])
 
   return (
@@ -67,7 +123,7 @@ const Queue = ({ navigation, route }) => {
 		    		<Text style={styles.queueHelper}>Make sure you are around the area to get queue</Text>
 		    	</View>
 
-		  		<Text style={styles.totalWaiting}>Total waiting users : 199999</Text>
+		  		<Text style={styles.totalWaiting}>Total waiting users : {totalWaitingUser}</Text>
 
 		    	<View style={styles.waitingQueueContainer}>
 		    		<Text style={styles.waitingQueueText}>Waiting users</Text>
