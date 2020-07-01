@@ -49,19 +49,19 @@ const Navigation = () => {
     // if user
     if (token !== null) {
       return (
-        <Drawer.Navigator headerMode="none">
-          <Drawer.Screen name="AdminDrawer" component={AdminDrawer} options={{ title: 'Admin Page', 'swipeEnabled': false }} />
-          <Drawer.Screen name="UserDrawer" component={UserDrawer} options={{ title: 'User Page' }} />
-        </Drawer.Navigator>
+        <Stack.Navigator headerMode="none">
+          <Stack.Screen name="AdminDrawer" component={AdminDrawer} options={{ title: 'Admin Page', 'swipeEnabled': false }} />
+          <Stack.Screen name="UserDrawer" component={UserDrawer} options={{ title: 'User Page' }} />
+        </Stack.Navigator>
       )
 
     // if guest
     } else {
       return (
-        <Drawer.Navigator headerMode="none">
-          <Drawer.Screen name="UserDrawer" component={UserDrawer} options={{ title: 'User Page' }} />
-          <Drawer.Screen name="AdminDrawer" component={AdminDrawer} options={{ title: 'Admin Page', 'swipeEnabled': false }} />
-        </Drawer.Navigator>
+        <Stack.Navigator headerMode="none">
+          <Stack.Screen name="UserDrawer" component={UserDrawer} options={{ title: 'User Page' }} />
+          <Stack.Screen name="AdminDrawer" component={AdminDrawer} options={{ title: 'Admin Page', 'swipeEnabled': false }} />
+        </Stack.Navigator>
       )
     }
   }

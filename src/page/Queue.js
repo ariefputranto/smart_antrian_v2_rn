@@ -1,8 +1,10 @@
 'use strict'
 
-import React, { useState, useEffect }from 'react'
+import React, { useState, useEffect, useRef }from 'react'
 import { guestApi } from '../component/CustomAxios'
 import AsyncStorage from '@react-native-community/async-storage'
+import GetLocation from 'react-native-get-location'
+// import useInterval from '../hooks/UseInterval'
 
 import {
   View,
@@ -12,48 +14,62 @@ import {
   ScrollView,
   SafeAreaView,
   YellowBox,
-  TouchableOpacity
+  TouchableOpacity,
+	Alert
 } from 'react-native'
 
 const Queue = ({ navigation, route }) => {
-	const [queue, setQueue] = useState([
-		{ "_id" : "5e9c83eccc641089eeb106e6", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 1, "date" : "2020-04-20", "time" : "2020-04-19T17:01:32.698Z", "__v" : 0 },
-		{ "_id" : "5e9c84001a186789feeada45", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 2, "date" : "2020-04-20", "time" : "2020-04-19T17:01:52.429Z", "__v" : 0 },
-		{ "_id" : "5e9c844789561b8a095a09d3", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 3, "date" : "2020-04-20", "time" : "2020-04-19T17:03:03.548Z", "__v" : 0 },
-		{ "_id" : "5e9c8465cf16518a11ccbada", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 4, "date" : "2020-04-20", "time" : "2020-04-19T17:03:33.598Z", "__v" : 0 },
-		{ "_id" : "5e9c8482cf16518a11ccbadb", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 5, "date" : "2020-04-20", "time" : "2020-04-19T17:04:02.764Z", "__v" : 0 },
-		{ "_id" : "5e9c8494cf16518a11ccbadc", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 6, "date" : "2020-04-20", "time" : "2020-04-19T17:04:20.393Z", "__v" : 0 },
-		{ "_id" : "5e9c84e2cf16518a11ccbadd", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 7, "date" : "2020-04-20", "time" : "2020-04-19T17:05:38.539Z", "__v" : 0 },
-		{ "_id" : "5e9c85191567d78a3f61a365", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 8, "date" : "2020-04-20", "time" : "2020-04-19T17:06:33.142Z", "__v" : 0 },
-		{ "_id" : "5e9c86528023d48a7f5cbd31", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 9, "date" : "2020-04-20", "time" : "2020-04-19T17:11:46.996Z", "__v" : 0 },
-		{ "_id" : "5e9c86649609f88a8bfdf2fe", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 10, "date" : "2020-04-20", "time" : "2020-04-19T17:12:04.135Z", "__v" : 0 },
-		{ "_id" : "5e9c872cf60cd28ab05f7cb2", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 11, "date" : "2020-04-20", "time" : "2020-04-19T17:15:24.448Z", "__v" : 0 },
-		{ "_id" : "5e9c87c6daaee58ad2eee554", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 12, "date" : "2020-04-20", "time" : "2020-04-19T17:17:58.927Z", "__v" : 0 },
-		{ "_id" : "5e9c87e5ed5aa78adf90db28", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 13, "date" : "2020-04-20", "time" : "2020-04-19T17:18:29.283Z", "__v" : 0 },
-		{ "_id" : "5e9c87fbed5aa78adf90db29", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 14, "date" : "2020-04-20", "time" : "2020-04-19T17:18:51.812Z", "__v" : 0 },
-		{ "_id" : "5e9c8816de382f8af1f8c3c6", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 15, "date" : "2020-04-20", "time" : "2020-04-19T17:19:18.109Z", "__v" : 0 },
-		{ "_id" : "5e9c885cde382f8af1f8c3c7", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 16, "date" : "2020-04-20", "time" : "2020-04-19T17:20:28.357Z", "__v" : 0 },
-		{ "_id" : "5e9c89573ce4438b32ba86d9", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 17, "date" : "2020-04-20", "time" : "2020-04-19T17:24:39.336Z", "__v" : 0 },
-		{ "_id" : "5e9c896f3ce4438b32ba86da", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 18, "date" : "2020-04-20", "time" : "2020-04-19T17:25:03.915Z", "__v" : 0 },
-		{ "_id" : "5e9c898e45297c8b3dae6b24", "is_hold" : false, "is_called" : false, "token" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : "5e9b6f8c89ccbe6c793bbf34", "code" : "A", "number" : 19, "date" : "2020-04-20", "time" : "2020-04-19T17:25:34.563Z", "__v" : 0 },
-	])
+	const [queue, setQueue] = useState([])
 	const [service, setService] = useState(null)
 	const [totalWaitingUser, setTotalWaitingUser] = useState(0)
+	const [positionHistory, setPositionHistory] = useState([])
+	const [avgWaitingTime, setAvgWaitingTime] = useState(0)
+	const [holdQueue, setHoldQueue] = useState(null)
+	const [intervalChecker, setIntervalChecker] = useState(null)
 	var ws = null
+	const intervalGetPosition = 5
 
-	const cancelQueue = () => {
-		navigation.popToTop()
+	// get waiting list user
+	const getWaitingList = () => {
+		guestApi.get('/api/guest/queue/get-list/' + service._id).then(response => {
+			if (response.data.statusCode == 200) {
+				setQueue(response.data.data)
+			} else {
+				Alert.alert('Warning!', response.data.message)
+			}
+		}, error => {
+			Alert.alert('Warning!', error.message)
+		})
 	}
 
-	YellowBox.ignoreWarnings(['VirtualizedLists should never be nested'])
+	// get hold queue
+	const getHoldQueue = async () => {
+		var currentQueue = await AsyncStorage.getItem('hold_queue_' + (service._id))
+  	if (currentQueue !== null) {
+  		currentQueue = JSON.parse(currentQueue)
+  	} else {
+  		currentQueue = null
+  	}
+
+		setHoldQueue(currentQueue)
+
+  	console.log('current hold queue: ')
+  	console.log(currentQueue)
+	}
+
+	// cancel queue button click
+	const cancelQueue = () => {
+		navigation.popToTop()
+		AsyncStorage.clear()
+	}
 
 	// initial config websocket
 	const initWs = () => {
-		var host = 'ws://localhost:3000/' + service.service_provider_id._id
+		var host = url_ws + '/' + service.service_provider_id._id
 		ws = new WebSocket(host)
 
 		ws.onmessage = msg => {
-			console.log(msg.data)
+			// console.log(msg.data)
 			var response = JSON.parse(msg.data)
 			if (typeof response.data.url !== 'undefined') {
 				var url = response.data.url
@@ -73,11 +89,43 @@ const Queue = ({ navigation, route }) => {
 					}
 				}
 
-				// get new queue
+				// when receive new queue
 				if (url == '/queue/new') {
 					if (service._id == response.data.queue.service_id) {
+						// add new queue into waiting list
+						setQueue(oldQueue => {
+							// function to compare
+							function compare( a, b ) {
+							  if ( a.number < b.number ){
+							    return -1;
+							  }
+
+							  if ( a.number > b.number ){
+							    return 1;
+							  }
+
+							  return 0;
+							}
+
+							var currentQueue = [...oldQueue, response.data.queue]
+							currentQueue.sort(compare)
+							return currentQueue
+						})
+
+						// get last count
 						ws.send(JSON.stringify({url: '/queue/count', service_id: service._id}))
 					}
+				}
+
+				// on service called calculate waiting time
+				if (url == '/queue/call' && response.statusCode == 200) {
+					// get average waiting time
+					ws.send(JSON.stringify({url: '/queue/average-waiting-time', service_id: service._id}))
+				}
+
+				// get average waiting time
+				if (url == '/queue/average-waiting-time' && response.statusCode == 200) {
+					setAvgWaitingTime(response.data.average_time)
 				}
 
 			}
@@ -87,19 +135,31 @@ const Queue = ({ navigation, route }) => {
 			if (typeof service._id !== 'undefined') {
 				// this.ws.send(JSON.stringify({url: '/queue/last-called', service_id: service._id, loket_id: this.singleLoket._id}))
 				ws.send(JSON.stringify({url: '/queue/count', service_id: service._id}))
+				ws.send(JSON.stringify({url: '/queue/average-waiting-time', service_id: service._id}))
 			}
 		}
 	}
 
+	// initialize service
 	useEffect(() => {
 		setService(route.params.services)
 	}, [])
 
+	// initialize get list queue
 	useEffect(() => {
 		console.log(service)
 
+		// init waiting list
+		if (service !== null) {
+			getWaitingList()
+			getHoldQueue()
+		}
+	}, [service])
+
+	// initialize websocket
+	useEffect(() => {
 		// init websocket
-		if (service != null) {
+		if (service !== null) {
 			initWs()
 		}
 
@@ -109,7 +169,218 @@ const Queue = ({ navigation, route }) => {
 				ws.close()
 			}
 		}
-	}, [service])
+	}, [queue])
+
+	// get position
+	const getPosition = () => {
+		// get location
+		GetLocation.getCurrentPosition({
+	    enableHighAccuracy: true,
+	    timeout: 15000,
+		}).then(location => {
+			console.log(location)
+
+			var currentPosition = {
+				latitude: location.latitude,
+				longitude: location.longitude
+			}
+
+			// set current position
+			if (positionHistory.length <= 10) {
+				setPositionHistory(position => [...position, currentPosition])
+			} else {
+				setPositionHistory(position => {
+					position.shift()
+					return [...position, currentPosition]
+				})
+			}
+
+		}, error => {
+			console.log('location error: ' + error.data.message)
+		})
+	}
+
+	// haversine calculation
+	const haversine = (coord1, coord2) => {
+		Number.prototype.toRad = function() {
+		   return this * Math.PI / 180;
+		}
+
+		var lat1 = coord1.latitude
+		var lon1 = coord1.longitude
+		var lat2 = coord2.latitude
+		var lon2 = coord2.longitude
+
+		var R = 6371000 // m 
+
+		//has a problem with the .toRad() method below.
+		var distanceLatitude = lat2 - lat1
+		distanceLatitude = distanceLatitude.toRad()
+		var distanceLongitude = lon2 - lon1
+		distanceLongitude = distanceLongitude.toRad()
+
+		var a = Math.sin(distanceLatitude/2) * Math.sin(distanceLatitude/2) + 
+	          Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) * 
+	          Math.sin(distanceLongitude/2) * Math.sin(distanceLongitude/2)
+
+		var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+
+		return R * c
+	}
+
+	// calculated time needed to arrive
+	const calculateTimeNeeded = () => {
+		var distance = haversine(positionHistory[0], positionHistory[positionHistory.length - 1])
+		var time = positionHistory.length * intervalGetPosition
+		var velocity = parseFloat(distance) / parseFloat(time) // m / sec
+
+		var serviceCoord = {
+			latitude: service.service_provider_id.latitude,
+			longitude: service.service_provider_id.longitude
+		}
+		var distanceFromLocation = haversine(positionHistory[positionHistory.length - 1], serviceCoord) // in meter
+		var timeRequiredToArrive = velocity > 0 ? (parseFloat(distanceFromLocation) / velocity) : null // in second
+
+		console.log('velocity: '+velocity+' m / sec')
+		console.log('distance to location: '+distanceFromLocation+' m')
+		console.log('time required to arrive: ' + (timeRequiredToArrive == null ? 'not moving' : timeRequiredToArrive + 'second'))
+
+		return {
+			velocity: velocity,
+			distance_from_loc: distanceFromLocation,
+			time_arrival: timeRequiredToArrive
+		}
+	}
+
+	// send and hold based on it's location
+	const smartQueue = (data, predictedQueue) => {
+		var isInsideOuter = data.distance_from_loc <= (service.service_provider_id.outer_distance * 1000)
+		var isInsideInner = data.distance_from_loc <= (service.service_provider_id.inner_distance * 1000)
+
+		// is inside inner distance
+		if (isInsideInner) {
+			console.log('inside inner')
+			console.log('service_id: ' + service._id)
+			console.log('queue_id: ' + (holdQueue !== null ? holdQueue._id : ''))
+
+			var params = {
+				service_id: service._id,
+				queue_id: holdQueue !== null ? holdQueue._id : null
+			}
+
+			guestApi.post('/api/guest/queue/get-fixed', params).then(response => {
+				if (response.data.statusCode == 200) {
+					setHoldQueue (response.data.data.queue)
+				} else {
+					Alert.alert('Warning', response.data.message)
+				}
+			}, error => {
+				console.log(error)
+				Alert.alert('Warning!', error.message)
+			})
+		} else if (!isInsideInner && isInsideOuter) {
+			console.log('inside outer')
+
+			// is inside outer distance
+			var params = {
+				service_id: service._id,
+				number_queue: predictedQueue,
+				queue_id: holdQueue !== null ? holdQueue._id : null
+			}
+			var oldHoldQueue = holdQueue
+
+			guestApi.post('/api/guest/queue/get-hold', params).then(response => {
+				if (response.data.statusCode == 200) {
+					// set to null if user move from inner to outer to recalculate
+					if (oldHoldQueue !== null && oldHoldQueue.is_fixed) {
+						setHoldQueue (null)
+					} else {
+						setHoldQueue (response.data.data.queue)
+					}
+				} else {
+					Alert.alert('Warning', response.data.message)
+				}
+			}, error => {
+				console.log(error)
+				Alert.alert('Warning!', error.message)
+			})
+		}
+	}
+
+	// calculated by place
+	const calculatedByPlace = () => {
+		var data = calculateTimeNeeded()
+		var predictedQueue = data.time_arrival / avgWaitingTime
+		smartQueue(data, predictedQueue)
+	}
+
+	// calculated by time
+	const calculatedByTime = (data) => {
+		var bookedTime = new Date(service.booked_time)
+		bookedTime = bookedTime.getTime()
+
+		var currentTime = new Date()
+		currentTime = currentTime.getTime()
+
+		if (intervalChecker === null) {
+			setIntervalChecker(Math.round(((bookedTime - currentTime) * 1000) / 5)) // in second
+		}
+
+		console.log('by time check interval: ' + intervalChecker)
+		console.log('current different: ' + (bookedTime - currentTime))
+
+		if ((bookedTime - currentTime) <= intervalChecker) {
+			var data = calculateTimeNeeded()
+			var predictedQueue = data.time_arrival / avgWaitingTime
+			smartQueue(data, predictedQueue)
+		}
+	}
+
+	// get position within 5 sec interval
+	useEffect(() => {
+		// set interval to get position get position every 1 minutes
+		const intervalPosition = setInterval(() => {
+			getPosition()
+		}, (intervalGetPosition * 1000))
+
+		return () => {
+			clearInterval(intervalPosition)
+		}
+	})
+
+	// calculate position
+	useEffect(() => {
+		console.log('position history :')
+		console.log(positionHistory)
+
+		if (positionHistory.length > 1) {
+			console.log('average waiting time')
+			console.log(avgWaitingTime)
+
+			if (typeof service.booked_time == 'undefined') {
+				console.log('in by place')
+				calculatedByPlace()
+			} else {
+				console.log('in by time')
+				calculatedByTime()
+			}
+			
+		}
+	}, [positionHistory])
+
+	// save to storage when queue holder changed
+	useEffect(() => {
+		if (service !== null && holdQueue !== null) {
+			AsyncStorage.setItem('hold_queue_' + service._id, JSON.stringify(holdQueue))
+		}
+
+		if (service !== null && holdQueue === null) {
+			AsyncStorage.removeItem('hold_queue_' + service._id)
+		}
+	}, [holdQueue])
+
+	// igonre yellow warning
+	YellowBox.ignoreWarnings(['VirtualizedLists should never be nested'])
 
   return (
 
@@ -119,7 +390,7 @@ const Queue = ({ navigation, route }) => {
 
 		    	<View style={styles.queueContainer}>
 		    		<Text style={styles.queueText}>Your number</Text>
-		    		<Text style={styles.queue}>A20</Text>
+		    		<Text style={styles.queue}>{ holdQueue !== null ? (holdQueue.code + holdQueue.number) : '-' }</Text>
 		    		<Text style={styles.queueHelper}>Make sure you are around the area to get queue</Text>
 		    	</View>
 
@@ -128,6 +399,7 @@ const Queue = ({ navigation, route }) => {
 		    	<View style={styles.waitingQueueContainer}>
 		    		<Text style={styles.waitingQueueText}>Waiting users</Text>
 		    		<FlatList
+			    		nestedScrollEnabled={true}
 		    			data = {queue}
 		    			keyExtractor = {(item) => item._id}
 		    			renderItem = {({item, index}) => (

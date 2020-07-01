@@ -3,13 +3,19 @@
 import axios from 'axios'
 import AsyncStorage from '@react-native-community/async-storage'
 
+var baseUrl = 'http://localhost:3000'
+if (Platform.OS !== 'ios') {
+  baseUrl = 'http://192.168.1.3:3000'
+}
+
 const userApi = axios.create({
-  'baseURL': 'http://localhost:3000'
+  'baseURL': baseUrl
 })
 
 const guestApi = axios.create({
-  'baseURL': 'http://localhost:3000'
+  'baseURL': baseUrl
 })
+
 
 // Logout
 const logout = async () => {
@@ -60,13 +66,13 @@ const generateImei = async () => {
 // login as guest
 const loginGuest = async () => {
   const params = {
-    imei: generateImei(),
+    imei: await generateImei(),
     expired_in: 86400 // 1 day expired
   }
 
   console.log(params)
 
-  const response = await axios.post(url + '/api/login-guest', params)
+  const response = await axios.post(baseUrl + '/api/login-guest', params)
   const token = response.data.data.token
   await AsyncStorage.setItem('guest_token', token)
   return token
