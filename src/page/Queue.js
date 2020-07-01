@@ -58,9 +58,27 @@ const Queue = ({ navigation, route }) => {
 	}
 
 	// cancel queue button click
-	const cancelQueue = () => {
-		navigation.popToTop()
+	const cancelQueue = async () => {
+		// close websocket connection
+		if (ws !== null) {
+			ws.close()
+		}
+
+		// if not null request set to hold
+		console.log('on cancel queue')
+		console.log(holdQueue)
+		if (holdQueue !== null) {
+			// is inside outer distance
+			var params = {
+				service_id: service._id,
+				queue_id: holdQueue._id
+			}
+
+			await guestApi.post('/api/guest/queue/cancel', params)
+		}
+
 		AsyncStorage.clear()
+		navigation.popToTop()
 	}
 
 	// initial config websocket
@@ -75,12 +93,20 @@ const Queue = ({ navigation, route }) => {
 				var url = response.data.url
 
 				// if last called
-				// if (url == '/queue/last-called') {
-				// 	if (typeof response.data.last_call !== 'undefined') {
-				// 		this.lastCalledNumber = response.data.last_call
-				// 		console.log(this.lastCalledNumber)
-				// 	}
-				// }
+				if (url == '/queue/last-called') {
+					if (typeof response.data.last_call !== 'undefined') {
+						var lastCalledNumber = response.data.last_call
+						var currentQueue = queue.filter(item => {
+							var currentNumber = item.code + '' + item.number
+							if (lastCalledNumber != currentNumber) {
+								return item
+							}
+
+						})
+
+						setQueue(currentQueue)
+					}
+				}
 
 				// get count
 				if (url == '/queue/count') {
