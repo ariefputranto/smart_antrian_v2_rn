@@ -322,14 +322,16 @@ const Queue = ({ navigation, route }) => {
 		var currentTime = new Date()
 		currentTime = currentTime.getTime()
 
+		var currentDifferent = (bookedTime - currentTime) * 1000 // different in second
+
 		if (intervalChecker === null) {
-			setIntervalChecker(Math.round(((bookedTime - currentTime) * 1000) / 5)) // in second
+			setIntervalChecker(Math.round(currentDifferent / 5)) // in second
 		}
 
 		console.log('by time check interval: ' + intervalChecker)
-		console.log('current different: ' + (bookedTime - currentTime))
+		console.log('current different: ' + currentDifferent)
 
-		if ((bookedTime - currentTime) <= intervalChecker) {
+		if (currentDifferent <= intervalChecker) {
 			var data = calculateTimeNeeded()
 			var predictedQueue = data.time_arrival / avgWaitingTime
 			smartQueue(data, predictedQueue)
