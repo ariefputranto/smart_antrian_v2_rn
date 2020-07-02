@@ -1,6 +1,8 @@
 'use strict';
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import AsyncStorage from '@react-native-community/async-storage'
+import { userApi } from '../component/CustomAxios'
 
 import {
 	View,
@@ -9,15 +11,73 @@ import {
 	FlatList,
 	StyleSheet,
 	TouchableOpacity,
+	Alert
 } from 'react-native'
 
 const Loket = ({ navigation }) => {
-	const [loket, setLoket] = useState([
-		{ "_id" : "5e9b6fc189ccbe6c793bbf36", "user_id" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : {_id: "5e9b6f8c89ccbe6c793bbf34", name: 'Customer Service'}, "name" : "Loket 1", "token_expiration_time" : 86400, "latitude" : -7.279889855430536, "longitude" : 112.79027938842775, "assign_user_id" : "5e9b6f6589ccbe6c793bbf32", "time" : "2020-04-18T21:23:13.502Z", "inner_distance" : 5, "outer_distance" : 10, "__v" : 0 },
-		{ "_id" : "5e9b6fd789ccbe6c793bbf37", "user_id" : "5e9b6f6589ccbe6c793bbf32", "service_provider_id" : "5e9b6d72ebe8a36c2356524d", "service_id" : {_id: "5e9b6f8c89ccbe6c793bbf34", name: 'Customer Service'}, "name" : "Loket 2", "token_expiration_time" : 86400, "latitude" : -7.279038466566971, "longitude" : 112.78993606567384, "assign_user_id" : null, "time" : "2020-04-18T21:23:35.122Z", "inner_distance" : 5, "outer_distance" : 10, "__v" : 0 }
-	])
+	const [loket, setLoket] = useState([])
+	const [user, setUser] = useState(null)
+	const [isAssign, setIsAssign] = useState(null)
+
+	const getLoket = () => {
+		console.log('start assign')
+		userApi.get('/api/user/loket').then(response => {
+			setLoket(response.data.data)
+			console.log('done assign')
+		}, error => {
+			Alert.alert('Warning!', error.message)
+		})
+	}
+
+	const getUser = async () => {
+		userApi.get('/api/user').then(response => {
+			setUser(response.data.data)
+		}, error => {
+			Alert.alert('Warning!', error.message)
+		})
+	}
+
+	const getCurrentStatus = () => {
+		userApi.get('/api/user/loket/check-assigned-user').then(response => {
+			setIsAssign(response.data.data)
+		}, error => {
+			Alert.alert('Warning!', error.message)
+		})
+	}
+
+	useEffect(() => {
+		navigation.addListener('focus', () => {
+      setTimeout(() => {
+      	getLoket()
+      }, 500)
+    })
+		getCurrentStatus()
+	}, [])
+
+	useEffect(() => {
+    if (isAssign === null) {
+    	getLoket()
+			getUser()
+    } else {
+    	navigation.navigate('CallQueue', {loket: isAssign})
+    }
+	}, [isAssign])
+
+	const assignUser = (loket) => {
+		var params = {
+			assign_user_id: user._id 
+		}
+
+		userApi.put('/api/user/loket/' + loket._id, params).then(response => {
+			console.log('response assign user')
+			console.log(response.data)
+		}, error => {
+			Alert.alert('Warning!', error.message)
+		})
+	}
 
 	const clickHandler = (item) => {
+		assignUser(item)
 		navigation.navigate('CallQueue', {loket: item})
 	}
 

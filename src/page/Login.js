@@ -25,6 +25,15 @@ const Login = ({ navigation }) => {
 
 		axios.post(url + '/api/login', params).then(async response => {
 			if (response.data.statusCode == 200) {
+				// only user is allowed
+				if (response.data.data.roles != 'User') {
+					Alert.alert('Success!', 'You are not allowed')
+					setTimeout(() => {
+						navigation.navigate('UserDrawer')
+					}, 400)
+					return
+				}
+
 				Alert.alert('Success!', response.data.message)
 
 				// save token into async storage
