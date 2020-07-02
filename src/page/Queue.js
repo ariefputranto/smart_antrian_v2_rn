@@ -118,25 +118,28 @@ const Queue = ({ navigation, route }) => {
 				// when receive new queue
 				if (url == '/queue/new') {
 					if (service._id == response.data.queue.service_id) {
+						// new request list
+						getWaitingList()
+
 						// add new queue into waiting list
-						setQueue(oldQueue => {
-							// function to compare
-							function compare( a, b ) {
-							  if ( a.number < b.number ){
-							    return -1;
-							  }
+						// setQueue(oldQueue => {
+						// 	// function to compare
+						// 	function compare( a, b ) {
+						// 	  if ( a.number < b.number ){
+						// 	    return -1;
+						// 	  }
 
-							  if ( a.number > b.number ){
-							    return 1;
-							  }
+						// 	  if ( a.number > b.number ){
+						// 	    return 1;
+						// 	  }
 
-							  return 0;
-							}
+						// 	  return 0;
+						// 	}
 
-							var currentQueue = [...oldQueue, response.data.queue]
-							currentQueue.sort(compare)
-							return currentQueue
-						})
+						// 	var currentQueue = [...oldQueue, response.data.queue]
+						// 	currentQueue.sort(compare)
+						// 	return currentQueue
+						// })
 
 						// get last count
 						ws.send(JSON.stringify({url: '/queue/count', service_id: service._id}))
